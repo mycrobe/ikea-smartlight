@@ -29,6 +29,7 @@ import os
 global coap
 coap = '/usr/local/bin/coap-client'
 
+
 def tradfri_power_light(hubip, apiuser, apikey, lightbulbid, value):
     """ function for power on/off tradfri lightbulb """
     tradfriHub = 'coaps://{}:5684/15001/{}' .format(hubip, lightbulbid)
@@ -67,6 +68,7 @@ def tradfri_dim_light(hubip, apiuser, apikey, lightbulbid, value):
 
     return result
 
+
 def tradfri_color_light(hubip, apiuser, apikey, lightbulbid, value):
     """ function for color temperature tradfri lightbulb """
     tradfriHub = 'coaps://{}:5684/15001/{}'.format(hubip, lightbulbid)
@@ -88,6 +90,7 @@ def tradfri_color_light(hubip, apiuser, apikey, lightbulbid, value):
         sys.exit(1)
 
     return result
+
 
 def tradfri_power_group(hubip, apiuser, apikey, groupid, value):
     """ function for power on/off tradfri lightbulb """
@@ -115,6 +118,29 @@ def tradfri_dim_group(hubip, apiuser, apikey, groupid, value):
     tradfriHub = 'coaps://{}:5684/15004/{}'.format(hubip, groupid)
     dim = float(value) * 2.55
     payload = '{ "5851" : %s }' % int(dim)
+
+    api = '{} -m put -u "{}" -k "{}" -e \'{}\' "{}"'.format(coap, apiuser, apikey,
+                                                                         payload, tradfriHub)
+
+    if os.path.exists(coap):
+        result = os.popen(api)
+    else:
+        sys.stderr.write('[-] libcoap: could not find libcoap\n')
+        sys.exit(1)
+
+    return result
+
+
+def tradfri_color_group(hubip, apiuser, apikey, groupid, value):
+    """ function for color temperature tradfri lightbulb """
+    tradfriHub = 'coaps://{}:5684/15004/{}'.format(hubip, groupid)
+
+    if value == 'warm':
+        payload = '{ "3311" : [{ "5709" : %s, "5710": %s }] }' % ("33135", "27211")
+    elif value == 'normal':
+        payload = '{ "3311" : [{ "5709" : %s, "5710": %s }] }' % ("30140", "26909")
+    elif value == 'cold':
+        payload = '{ "3311" : [{ "5709" : %s, "5710": %s }] }' % ("24930", "24684")
 
     api = '{} -m put -u "{}" -k "{}" -e \'{}\' "{}"'.format(coap, apiuser, apikey,
                                                                          payload, tradfriHub)

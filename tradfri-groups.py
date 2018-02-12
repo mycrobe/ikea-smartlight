@@ -70,6 +70,13 @@ def main():
         else:
             sys.stderr.write('[-] Tradfri: dim value can only be between 1 and 100\n')
             sys.exit(1)
+    elif args.action == 'color':
+        if args.value in ['warm', 'normal', 'cold']:
+            tradfriActions.tradfri_color_group(hubip, apiuser, apikey, args.groupid, args.value)
+        else:
+            sys.stderr.write('[-] Tradfri: color value can only be warm/normal/cold\n')
+            sys.exit(1)
+
 
 if __name__ == "__main__":
     main()
